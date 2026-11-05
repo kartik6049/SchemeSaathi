@@ -1,0 +1,23 @@
+# Production overrides for a single server. Use together with docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile full up -d --build
+# Every secret comes from the .env file next to this one (see HOST_GUIDE.md);
+# compose refuses to start if one is missing, so the dev defaults can't leak into production.
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    restart: unless-stopped
+
+  api:
+    environment:
+      DATABASE_URL: postgres://saathi:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/schemesaathi
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      CORS_ORIGIN: https://${DOMAIN:?set DOMAIN in .env}
+      COOKIE_SECURE: "true"
+      API_RATE_LIMIT: ${API_RATE_LIMIT:-300}
+    restart: unless-stopped
+
+  web:
+    restart: unless-stopped

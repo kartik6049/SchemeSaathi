@@ -1,0 +1,52 @@
+# SchemeSaathi local stack.
+#   docker compose up -d db              -> only Postgres (for `npm run dev`)
+#   docker compose --profile full up -d  -> Postgres + API + web UI
+# All ports are bound to 127.0.0.1 so nothing is exposed to your network.
+name: schemesaathi
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: saathi
+      POSTGRES_PASSWORD: saathi_dev_pw
+      POSTGRES_DB: schemesaathi
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./server/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saathi -d schemesaathi"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    profiles: ["full"]
+    build: ./server
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgres://saathi:saathi_dev_pw@db:5432/schemesaathi
+      JWT_SECRET: ${JWT_SECRET:-docker-local-secret-change-me-0123456789abcdef}
+      CORS_ORIGIN: http://localhost:8080
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@schemesaathi.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMe!2026}
+      COOKIE_SECURE: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:4000:4000"
+
+  web:
+    profiles: ["full"]
+    build: ./client
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:8080:80"
+
+volumes:
+  pgdata:

@@ -1,0 +1,183 @@
+/*
+ * SchemeSaathi design system — "civic broadsheet".
+ *
+ * Identity: Indian public-notice / newspaper print. Warm paper and ink,
+ * hairline rules instead of card grids, an editorial serif for headlines,
+ * one deep civic green for action and a sparing marigold accent.
+ *
+ * All colours live in CSS variables below (light + dark), exposed to
+ * Tailwind as semantic utilities: bg-paper, bg-surface, text-ink, text-ink-2,
+ * border-rule, bg-primary, text-accent, text-ok / warn / bad, …
+ */
+@import 'tailwindcss';
+@import '@fontsource-variable/newsreader/opsz.css';
+@import '@fontsource-variable/newsreader/opsz-italic.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-sans-devanagari/400.css';
+@import '@fontsource/ibm-plex-sans-devanagari/500.css';
+@import '@fontsource/ibm-plex-sans-devanagari/600.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* surfaces */
+  --paper: #f3eee4;
+  --surface: #fbf8f2;
+  --surface-2: #ebe4d6;
+  --rule: #d6cbb7;
+  --rule-strong: #1c1b17;
+  /* ink */
+  --ink: #1c1b17;
+  --ink-2: #4b463d;
+  --ink-3: #6b6459;
+  /* action */
+  --primary: #1f4d3a;
+  --primary-hover: #173d2e;
+  --primary-ink: #f6f1e7;
+  --primary-soft: #dfe8df;
+  /* accent (sparingly: highlights, active marks) */
+  --accent: #946013;
+  --accent-soft: #f6e7c8;
+  /* status — always paired with an icon + label */
+  --ok: #24663f;
+  --ok-soft: #e1eddf;
+  --warn: #925d00;
+  --warn-soft: #f7eacd;
+  --bad: #a8321f;
+  --bad-soft: #f4ddd6;
+  --focus: #946013;
+  --grain-opacity: 0.35;
+}
+
+.dark {
+  --paper: #121310;
+  --surface: #1a1c18;
+  --surface-2: #23261f;
+  --rule: #34372f;
+  --rule-strong: #e9e3d6;
+  --ink: #ece6d9;
+  --ink-2: #bdb6a7;
+  --ink-3: #8b8578;
+  --primary: #8cc5a0;
+  --primary-hover: #a5d6b6;
+  --primary-ink: #0f1a14;
+  --primary-soft: #1e2e24;
+  --accent: #e6ac4a;
+  --accent-soft: #3a2e17;
+  --ok: #8cc5a0;
+  --ok-soft: #1c2b21;
+  --warn: #e6ac4a;
+  --warn-soft: #33291a;
+  --bad: #ec8a76;
+  --bad-soft: #3a211c;
+  --focus: #e6ac4a;
+  --grain-opacity: 0.18;
+}
+
+@theme {
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader Variable', 'IBM Plex Sans Devanagari', Georgia, serif;
+
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+
+  --radius-sm: 3px;
+  --radius-md: 5px;
+
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade: fade 0.3s ease-out both;
+  --animate-draw: draw 0.6s cubic-bezier(0.6, 0, 0.2, 1) both;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  /* rules "draw" left-to-right on entry */
+  @keyframes draw {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    color-scheme: light;
+  }
+  html.dark { color-scheme: dark; }
+
+  body {
+    @apply min-h-dvh bg-paper font-sans text-[15px] leading-relaxed text-ink antialiased sm:text-base;
+    font-feature-settings: 'ss01';
+    /* Paper grain: an inline SVG noise tile, kept behind everything. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-blend-mode: multiply;
+  }
+  .dark body { background-blend-mode: screen; }
+
+  html[lang='hi'] body { line-height: 1.75; }
+  /* Devanagari has no serif companion here; keep headings in Plex for Hindi. */
+  html[lang='hi'] .font-serif { font-family: 'IBM Plex Sans Devanagari', 'IBM Plex Sans', sans-serif; font-weight: 600; letter-spacing: 0; }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+}
+
+@layer components {
+  /* Small-caps label used for metadata, section kickers and table heads. */
+  .kicker {
+    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-ink-3;
+  }
+  /* Hairline rule that draws in on entry. */
+  .rule-draw {
+    @apply origin-left animate-draw;
+  }
+  .link {
+    @apply underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:decoration-primary hover:text-primary;
+  }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+  body:has(.print-area[open]) *:not(.print-area, .print-area *, :has(.print-area)) { display: none !important; }
+  .print-area[open] { position: static; max-height: none; width: 100%; box-shadow: none; }
+}
